@@ -50,6 +50,12 @@ VIRTUAL_HEIGHT = 243
 -- paddle movement speed
 PADDLE_SPEED = 200
 
+-- AI reaction values
+AI_PLAYER_ONE = false
+AI_PLAYER_TWO = true
+PLAYER_ONE_COLLISION = false
+PLAYER_TWO_COLLISION = false
+
 --[[
     Called just once at the beginning of the game; used to set up
     game objects, variables, etc. and prepare the game world.
@@ -140,8 +146,12 @@ function love.update(dt)
         -- on player who last scored
         ball.dy = math.random(-50, 50)
         if servingPlayer == 1 then
+            PLAYER_ONE_COLLISION = false
+            PLAYER_TWO_COLLISION = true
             ball.dx = math.random(140, 200)
         else
+            PLAYER_ONE_COLLISION = true
+            PLAYER_TWO_COLLISION = false
             ball.dx = -math.random(140, 200)
         end
     elseif gameState == 'play' then
@@ -151,7 +161,8 @@ function love.update(dt)
         if ball:collides(player1) then
             ball.dx = -ball.dx * 1.03
             ball.x = player1.x + 5
-
+            PLAYER_ONE_COLLISION = false
+            PLAYER_TWO_COLLISION = true
             -- keep velocity going in the same direction, but randomize it
             if ball.dy < 0 then
                 ball.dy = -math.random(10, 150)
@@ -165,6 +176,8 @@ function love.update(dt)
             ball.dx = -ball.dx * 1.03
             ball.x = player2.x - 4
 
+            PLAYER_ONE_COLLISION = true
+            PLAYER_TWO_COLLISION = false
             -- keep velocity going in the same direction, but randomize it
             if ball.dy < 0 then
                 ball.dy = -math.random(10, 150)
@@ -230,26 +243,61 @@ function love.update(dt)
     end
 
     --
-    -- paddles can move no matter what state we're in
+    -- paddles can move no matter what state we're in and just if they are not
+    -- AI controlled
     --
     -- player 1
-    if love.keyboard.isDown('w') then
-        player1.dy = -PADDLE_SPEED
-    elseif love.keyboard.isDown('s') then
-        player1.dy = PADDLE_SPEED
+    if not AI_PLAYER_ONE then
+        if love.keyboard.isDown('w') then
+            player1.dy = -PADDLE_SPEED
+        elseif love.keyboard.isDown('s') then
+            player1.dy = PADDLE_SPEED
+        else
+            player1.dy = 0
+        end
     else
-        player1.dy = 0
+        -- The easiest AI implementation for the paddle is to just match the balls
+        -- y position
+        if PLAYER_ONE_COLLISION and gameState == 'play' then
+            playerOneBallDistance = ball.y - player1.y
+            
+            if(playerOneBallDistance > 0) then
+                player1.dy = math.min(1,(ball.y - player1.y)) * PADDLE_SPEED
+            elseif(playerOneBallDistance < 0) then
+                player1.dy = math.max(-1,(ball.y - player1.y)) * PADDLE_SPEED
+            end
+        else 
+            player1.dy = 0
+        end
     end
 
     -- player 2
-    if love.keyboard.isDown('up') then
-        player2.dy = -PADDLE_SPEED
-    elseif love.keyboard.isDown('down') then
-        player2.dy = PADDLE_SPEED
+    if not AI_PLAYER_TWO then
+        if love.keyboard.isDown('up') then
+            player2.dy = -PADDLE_SPEED
+        elseif love.keyboard.isDown('down') then
+            player2.dy = PADDLE_SPEED
+        else
+            player2.dy = 0
+        end
     else
-        player2.dy = 0
+        -- The easiest AI implementation for the paddle is to just match the balls
+        -- y position
+        if PLAYER_TWO_COLLISION and gameState == 'play' then
+            playerTwoBallDistance = ball.y - player2.y
+
+            if(playerTwoBallDistance > 0) then
+                player2.dy = math.min(1,(ball.y - player2.y)) * PADDLE_SPEED
+            elseif(playerTwoBallDistance < 0) then
+                player2.dy = math.max(-1,(ball.y - player2.y)) * PADDLE_SPEED
+            end
+        else
+            player2.dy = 0
+        end
     end
 
+
+    
     -- update our ball based on its DX and DY only if we're in play state;
     -- scale the velocity by dt so movement is framerate-independent
     if gameState == 'play' then
@@ -292,10 +340,23 @@ function love.keypressed(key)
             -- decide serving player as the opposite of who won
             if winningPlayer == 1 then
                 servingPlayer = 2
+                PLAYER_ONE_COLLISION = true
+                PLAYER_TWO_COLLISION = false
             else
+                PLAYER_ONE_COLLISION = false
+                PLAYER_TWO_COLLISION = true
                 servingPlayer = 1
             end
         end
+    elseif key == '1' and gameState == 'start' then
+        AI_PLAYER_ONE = false
+        AI_PLAYER_TWO = true
+    elseif key == '2' and gameState == 'start'  then
+        AI_PLAYER_ONE = false
+        AI_PLAYER_TWO = false
+    elseif key == '3' and gameState == 'start'  then
+        AI_PLAYER_ONE = true
+        AI_PLAYER_TWO = true
     end
 end
 
@@ -314,7 +375,10 @@ function love.draw()
         -- UI messages
         love.graphics.setFont(smallFont)
         love.graphics.printf('Welcome to Pong!', 0, 10, VIRTUAL_WIDTH, 'center')
-        love.graphics.printf('Press Enter to begin!', 0, 20, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Press 1 to play as player 1 (default)!', 0, 20, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Press 2 to play as player 1 & 2!', 0, 30, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Press 3 to let AI play as players 1 & 2!', 0, 40, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Press Enter to begin!', 0, 50, VIRTUAL_WIDTH, 'center')
     elseif gameState == 'serve' then
         -- UI messages
         love.graphics.setFont(smallFont)
