@@ -53,9 +53,11 @@ end
     This function is specifically made to piece out the bricks from the
     sprite sheet. Since the sprite sheet has non-uniform sprites within,
     we have to return a subset of GenerateQuads.
+    We shouldn't use 22 or 23 because they are the balls in the sprite sheet. We added the logic
+    to slice the table from 1 to 24. so we can include the locked brick
 ]]
 function GenerateQuadsBricks(atlas)
-    return table.slice(GenerateQuads(atlas, 32, 16), 1, 21)
+    return table.slice(GenerateQuads(atlas, 32, 16), 1, --[[21]] 24)
 end
 
 --[[
@@ -124,4 +126,10 @@ function GenerateQuadsBalls(atlas)
     end
 
     return quads
+end
+
+-- This function is specifically made to piece out the powerups from the
+-- sprite sheet.
+function GenerateQuadsPowerUps(atlas)
+    return table.slice(GenerateQuads(atlas, 16, 16), 145, 154)
 end

@@ -52,8 +52,8 @@ paletteColors = {
 
 function Brick:init(x, y)
     -- used for coloring and score calculation
-    self.tier = 0
-    self.color = 1
+    self.tier = 0 -- from [4 - 7]
+    self.color = 1 -- From [0 - 5] : (0) blue, green, red, purple, gold, black
     
     self.x = x
     self.y = y
@@ -78,6 +78,9 @@ function Brick:init(x, y)
 
     -- spread of particles; normal looks more natural than uniform
     self.psystem:setEmissionArea('normal', 10, 10)
+    
+    -- Is this a locked brick?
+    self.isLocked = false
 end
 
 --[[
@@ -104,6 +107,11 @@ function Brick:hit()
     gSounds['brick-hit-2']:stop()
     gSounds['brick-hit-2']:play()
 
+    -- check for color 5 and tier 7, locked brick
+    if self.color == 5 and self.tier == 7 then
+        self.inPlay = false
+    end
+    
     -- if we're at a higher tier than the base, we need to go down a tier
     -- if we're already at the lowest color, else just go down a color
     if self.tier > 0 then

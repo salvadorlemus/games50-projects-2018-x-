@@ -84,6 +84,9 @@ function LevelMaker.createMap(level)
                 skipFlag = not skipFlag
             end
 
+            -- Added a locked brick into the mix
+            local lockedBrick = math.random(1, 10) == 10 and true or false
+
             b = Brick(
                 -- x-coordinate
                 (x-1)                   -- decrement x by 1 because tables are 1-indexed, coords are 0
@@ -94,7 +97,7 @@ function LevelMaker.createMap(level)
                 -- y-coordinate
                 y * 16                  -- just use y * 16, since we need top padding anyway
             )
-
+            
             -- if we're alternating, figure out which color/tier we're on
             if alternatePattern and alternateFlag then
                 b.color = alternateColor1
@@ -110,7 +113,14 @@ function LevelMaker.createMap(level)
             if not alternatePattern then
                 b.color = solidColor
                 b.tier = solidTier
-            end 
+            end
+
+            if lockedBrick then
+                b.isLocked = true
+                b.color = 5 -- (0) blue, green, red, purple, gold, black
+                b.tier = 7
+                lockedBrick = false
+            end
 
             table.insert(bricks, b)
 
