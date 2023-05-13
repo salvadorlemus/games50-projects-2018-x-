@@ -2,6 +2,10 @@
 
 Breakout game for CS50G course
 
+Code has been made to run in LOVE2DT https://love2d.org/
+
+Follo the instructions in teh wiki to run the game https://love2d.org/wiki/Getting_Started
+
 Details : 
 
 Add a Powerup class to the game that spawns a powerup (images located at the bottom of the sprite sheet in the distribution code). This Powerup should spawn randomly, be it on a timer or when the Ball hits a Block enough times, and gradually descend toward the player. Once collided with the Paddle, two more Balls should spawn and behave identically to the original, including all collision and scoring points for the player. Once the player wins and proceeds to the VictoryState for their current level, the Balls should reset so that there is only one active again.
