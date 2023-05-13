@@ -1,5 +1,9 @@
 # salvadorlemus
 
+Code has been made to run in LOVE2DT https://love2d.org/
+
+Follo the instructions in teh wiki to run the game https://love2d.org/wiki/Getting_Started
+
 Implementation of :
 
 Randomize the gap between pipes (vertical space), such that they’re no longer hardcoded to 90 pixels.
