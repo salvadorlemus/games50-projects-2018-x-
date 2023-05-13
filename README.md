@@ -2,9 +2,9 @@
 
 Breakout game for CS50G course
 
-Code has been made to run in LOVE2DT https://love2d.org/
+Code has been made to run in LOVE2D https://love2d.org/
 
-Follo the instructions in teh wiki to run the game https://love2d.org/wiki/Getting_Started
+Follow the instructions in the wiki to run the game https://love2d.org/wiki/Getting_Started
 
 Details : 
 
